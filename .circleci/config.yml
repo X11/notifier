@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/X11/notifier-commitstrip
+    steps:
+      - checkout
+      - run: go get -u github.com/golang/dep/cmd/dep
+      - run: dep ensure
+      - run: go run main.go
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - build
+  notify:
+    triggers:
+      - schedule:
+          cron: "*/30 * * * *"
+          filters:
+            branches:
+              only: 
+                - master
+    jobs:
+      - build
