@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.9
-    working_directory: /go/src/github.com/X11/notifier-commitstrip
+    working_directory: /go/src/github.com/X11/notifier
     steps:
       - checkout
       - run: go get -u github.com/golang/dep/cmd/dep
