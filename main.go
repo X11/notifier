@@ -34,7 +34,8 @@ func sendPhoto(imageUrl string, caption string) {
 	}
 
 	if resp.StatusCode != 200 {
-		panic("Response is not 200")
+		body, _ := ioutil.ReadAll(resp.Body)
+		panic(string(body))
 	}
 }
 
@@ -103,7 +104,7 @@ func main() {
 		panic(err)
 	}
 
-	imageSrc := regexp.MustCompile(`src="([^"]*)"`)
+	imageSrc := regexp.MustCompile(`img src="([^"]*)"`)
 
 	item := feed.Items[0]
 	if item.GUID != guid {
