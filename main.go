@@ -3,5 +3,7 @@ package main
 func main() {
 	NotifyCommitstrip()
 	NotifyXkcd()
-	updateState()
+	if isDirtyState() {
+		updateState()
+	}
 }

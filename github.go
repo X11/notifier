@@ -15,6 +15,7 @@ const (
 )
 
 var (
+	RAW_STATE     string
 	FETCHED_STATE *State
 )
 
@@ -43,8 +44,9 @@ func getGistFileContent(g Gist) string {
 }
 
 func getStateFromGist(g Gist) *State {
+	RAW_STATE = getGistFileContent(g)
 	FETCHED_STATE = &State{}
-	if err := json.Unmarshal([]byte(getGistFileContent(g)), &FETCHED_STATE); err != nil {
+	if err := json.Unmarshal([]byte(RAW_STATE), &FETCHED_STATE); err != nil {
 		panic(err)
 	}
 	return FETCHED_STATE
@@ -89,6 +91,10 @@ func prepareUpdatedGist() []byte {
 		panic(err)
 	}
 	return val
+}
+
+func isDirtyState() bool {
+	return RAW_STATE != string(marshalState())
 }
 
 func updateState() {
