@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -52,8 +53,24 @@ func getStateFromGist(g Gist) *State {
 	return FETCHED_STATE
 }
 
+func newGithubRequest(method string, url string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(os.Getenv("GITHUB_AUTHENTICATION"))))
+	return req, err
+}
+
 func fetchState() *State {
-	resp, err := http.Get(getGistUrl())
+	req, err := newGithubRequest("GET", getGistUrl(), nil)
+	if err != nil {
+		panic(err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
 	}
@@ -98,7 +115,7 @@ func isDirtyState() bool {
 }
 
 func updateState() {
-	req, err := http.NewRequest("PATCH", getGistUrl(), bytes.NewBuffer(prepareUpdatedGist()))
+	req, err := newGithubRequest("PATCH", getGistUrl(), bytes.NewBuffer(prepareUpdatedGist()))
 	if err != nil {
 		panic(err)
 	}
