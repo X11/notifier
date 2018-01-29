@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/mmcdole/gofeed"
+	"sync"
 )
 
 type ToonholeState struct {
@@ -12,14 +11,6 @@ type ToonholeState struct {
 		GUID string `json:"guid"`
 	} `json:"toonhole"`
 }
-
-const (
-	TOONHOLE_FEED_URL = "http://toonhole.com/feed/"
-)
-
-var (
-	TOONHOLE_IMAGE_SOURCE_REGEX = regexp.MustCompile(`img [^>]* src="([^"]*)"`)
-)
 
 func getToonholeGUID() string {
 	return GetState().Toonhole.GUID
@@ -29,16 +20,24 @@ func updateToonholeGUID(guid string) {
 	GetState().Toonhole.GUID = guid
 }
 
-func NotifyToonhole() {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(TOONHOLE_FEED_URL)
-	if err != nil {
-		panic(err)
-	}
+type Toonhole struct {
+	ImageFeedNotifier
+}
 
+func NewToonhole() *Toonhole {
+	n := &Toonhole{}
+	n.feedURL = "http://toonhole.com/feed/"
+	n.imageRegex = regexp.MustCompile(`img [^>]* src="([^"]*)"`)
+	return n
+}
+
+func (x *Toonhole) Execute(wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	feed := x.getFeed()
 	item := feed.Items[0]
 	if item.GUID != getToonholeGUID() {
-		image := TOONHOLE_IMAGE_SOURCE_REGEX.FindStringSubmatch(item.Content)[1]
+		image := x.getImage(item.Content, 1)
 		fmt.Println("[TOONHOLE] Sending new image: " + image)
 		updateToonholeGUID(item.GUID)
 		SendPhoto(image, item.Title)

@@ -32,6 +32,11 @@ func SendPhoto(imageUrl string, caption string) {
 		Caption: caption,
 	})
 
+	if os.Getenv("LOG_INSTEAD_OF_SEND") == "true" {
+		fmt.Printf("jsonVal = %+v\n", jsonVal)
+		return
+	}
+
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonVal))
 	if err != nil {
 		panic(err)

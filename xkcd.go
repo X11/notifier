@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/mmcdole/gofeed"
+	"sync"
 )
 
 type XkcdState struct {
@@ -12,14 +11,6 @@ type XkcdState struct {
 		GUID string `json:"guid"`
 	} `json:"xkcd"`
 }
-
-const (
-	XKCD_FEED_URL = "https://xkcd.com/rss.xml"
-)
-
-var (
-	XKCD_SOURCE_REGEX = regexp.MustCompile(`img src="([^"]*)" title="([^"]*)"`)
-)
 
 func getXkcdGUID() string {
 	return GetState().Xkcd.GUID
@@ -29,18 +20,26 @@ func updateXkcdGUID(guid string) {
 	GetState().Xkcd.GUID = guid
 }
 
-func NotifyXkcd() {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(XKCD_FEED_URL)
-	if err != nil {
-		panic(err)
-	}
+type Xkcd struct {
+	ImageFeedNotifier
+}
 
+func NewXkcd() *Xkcd {
+	n := &Xkcd{}
+	n.feedURL = "https://xkcd.com/rss.xml"
+	n.imageRegex = regexp.MustCompile(`img src="([^"]*)" title="([^"]*)"`)
+	return n
+}
+
+func (x *Xkcd) Execute(wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	feed := x.getFeed()
 	item := feed.Items[0]
 	if item.GUID != getXkcdGUID() {
-		matches := XKCD_SOURCE_REGEX.FindStringSubmatch(item.Description)
-		image := matches[1]
-		caption := fmt.Sprintf("%s\n%s", item.Title, matches[2])
+		image := x.getImage(item.Description, 1)
+		alt := x.getImage(item.Description, 2)
+		caption := fmt.Sprintf("%s\n%s", item.Title, alt)
 		fmt.Println("[XKCD] Sending new image: " + image)
 		updateXkcdGUID(item.GUID)
 		SendPhoto(image, caption)
