@@ -18,6 +18,7 @@ func getCommitstripGUID() string {
 
 func updateCommitstripGUID(guid string) {
 	GetState().Commitstrip.GUID = guid
+	SetStateDirty()
 }
 
 type Commitstrip struct {

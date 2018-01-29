@@ -18,6 +18,7 @@ func getXkcdGUID() string {
 
 func updateXkcdGUID(guid string) {
 	GetState().Xkcd.GUID = guid
+	SetStateDirty()
 }
 
 type Xkcd struct {

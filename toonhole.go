@@ -18,6 +18,7 @@ func getToonholeGUID() string {
 
 func updateToonholeGUID(guid string) {
 	GetState().Toonhole.GUID = guid
+	SetStateDirty()
 }
 
 type Toonhole struct {

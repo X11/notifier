@@ -1,41 +1,14 @@
 package main
 
-import (
-	"regexp"
-	"sync"
-
-	"github.com/mmcdole/gofeed"
-)
-
-type FeedNotifier struct {
-	feedURL string
-}
-
-func (fn *FeedNotifier) getFeed() *gofeed.Feed {
-	fp := gofeed.NewParser()
-	feed, err := fp.ParseURL(fn.feedURL)
-	if err != nil {
-		panic(err)
-	}
-
-	return feed
-}
-
-type ImageFeedNotifier struct {
-	FeedNotifier
-	imageRegex *regexp.Regexp
-}
-
-func (ifn *ImageFeedNotifier) getImage(target string, i int) string {
-	matches := ifn.imageRegex.FindStringSubmatch(target)
-	return matches[i]
-}
+import "sync"
 
 type Execute interface {
 	Execute(*sync.WaitGroup)
 }
 
 func main() {
+	FetchState()
+
 	notifiers := []Execute{
 		NewXkcd(),
 		NewCommitstrip(),
@@ -51,7 +24,5 @@ func main() {
 
 	wg.Wait()
 
-	if isDirtyState() {
-		updateState()
-	}
+	UpdateState()
 }
