@@ -26,8 +26,8 @@ type SendPhotoObject struct {
 func SendPhoto(imageUrl string, caption string) {
 	url := fmt.Sprintf("%s/sendPhoto", getTelegramBotUrl())
 
-	if len(caption) > 150 {
-		caption = caption[0:150]
+	if len(caption) > 200 {
+		caption = caption[0:200]
 	}
 
 	jsonVal, _ := json.Marshal(SendPhotoObject{
