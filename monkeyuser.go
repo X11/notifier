@@ -9,7 +9,7 @@ import (
 type MonkeyuserState struct {
 	Monkeyuser struct {
 		GUID string `json:"guid"`
-	} `json:"toonhole"`
+	} `json:"monkeyuser"`
 }
 
 func getMonkeyuserGUID() string {
@@ -39,7 +39,7 @@ func (x *Monkeyuser) Execute(wg *sync.WaitGroup) {
 	item := feed.Items[0]
 	if item.GUID != getMonkeyuserGUID() {
 		image := x.getImage(item.Description, 1)
-		fmt.Println("[TOONHOLE] Sending new image: " + image)
+		fmt.Println("[MONKEYUSER] Sending new image: " + image)
 		updateMonkeyuserGUID(item.GUID)
 		SendPhoto(image, item.Title)
 	}
