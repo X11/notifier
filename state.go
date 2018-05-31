@@ -10,6 +10,7 @@ type State struct {
 	CommitstripState
 	XkcdState
 	ToonholeState
+	MonkeyuserState
 }
 
 var s *State

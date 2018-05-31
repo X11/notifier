@@ -13,6 +13,7 @@ func main() {
 		NewXkcd(),
 		NewCommitstrip(),
 		NewToonhole(),
+		NewMonkeyuser(),
 	}
 
 	var wg sync.WaitGroup
