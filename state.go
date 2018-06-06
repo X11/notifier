@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	gstate "github.com/X11/go-gstate"
+	gstate "github.com/X11/go-gist-store"
 )
 
 type State struct {
