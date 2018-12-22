@@ -39,8 +39,10 @@ func (x *Monkeyuser) Execute(wg *sync.WaitGroup) {
 	item := feed.Items[0]
 	if item.GUID != getMonkeyuserGUID() {
 		image := x.getImage(item.Description, 1)
-		fmt.Println("[MONKEYUSER] Sending new image: " + image)
 		updateMonkeyuserGUID(item.GUID)
-		SendPhoto(image, item.Title)
+		if image != "" {
+			fmt.Println("[MONKEYUSER] Sending new image: " + image)
+			SendPhoto(image, item.Title)
+		}
 	}
 }
