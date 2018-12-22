@@ -27,5 +27,8 @@ type ImageFeedNotifier struct {
 
 func (ifn *ImageFeedNotifier) getImage(target string, i int) string {
 	matches := ifn.imageRegex.FindStringSubmatch(target)
-	return matches[i]
+	if len(matches) >= i {
+		return matches[i]
+	}
+	return ""
 }
